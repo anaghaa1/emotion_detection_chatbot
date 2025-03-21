@@ -1,6 +1,6 @@
 Flask
 flask-cors
-torch==2.1.0+cpu
+torch==2.1.0
 soundfile
 transformers
 cohere
