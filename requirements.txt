@@ -1,0 +1,14 @@
+Flask
+flask-cors
+torch
+soundfile
+transformers
+cohere
+python-dotenv
+streamlit
+requests
+sounddevice
+numpy
+scipy
+speechrecognition
+gtts

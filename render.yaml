@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: emotion-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn server:app --bind 0.0.0.0:5001
+    plan: free
+    envVars:
+      - key: PORT
+        value: 5001
