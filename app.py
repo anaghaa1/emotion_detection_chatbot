@@ -8,8 +8,8 @@ from gtts import gTTS
 import base64
 
 # 🎯 Server URLs (Update if deployed)
-EMOTION_SERVER_URL = "http://127.0.0.1:5001/predict"
-COHERE_SERVER_URL = "http://127.0.0.1:5001/cohere_response"
+EMOTION_SERVER_URL = "https://emotion-detection-chatbot-jk79.onrender.com/predict"
+COHERE_SERVER_URL = "https://emotion-detection-chatbot-jk79.onrender.com/cohere_response"
 
 # 🎙 Audio settings
 FILENAME = "recorded_audio.wav"
