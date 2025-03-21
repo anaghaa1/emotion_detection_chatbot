@@ -17,7 +17,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Google Drive file ID for the model
-GOOGLE_DRIVE_FILE_ID = "https://drive.google.com/file/d/1jHqUsguayTcoyxW1Ckqu8k4uLIlEXzai/view?usp=sharing"  # Replace this with your actual file ID
+GOOGLE_DRIVE_FILE_ID = "1jHqUsguayTcoyxW1Ckqu8k4uLIlEXzai"  # Corrected File ID
 MODEL_PATH = "my_trained_model.pth"
 
 # Function to download model from Google Drive
@@ -33,8 +33,9 @@ download_model()
 # Load the trained emotion detection model
 processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base")
 model = Wav2Vec2ForSequenceClassification.from_pretrained(
-    "facebook/wav2vec2-base", num_labels=7, state_dict=torch.load(MODEL_PATH, map_location=torch.device("cpu"))
+    "facebook/wav2vec2-base", num_labels=7
 )
+model.load_state_dict(torch.load(MODEL_PATH, map_location=torch.device("cpu")), strict=False)
 model.eval()  # Set model to evaluation mode
 
 # Emotion label mapping
@@ -86,5 +87,7 @@ def get_cohere_response():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# Set correct PORT for Render
+PORT = int(os.getenv("PORT", 5000))
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5001)  # Allow external access
+    app.run(debug=True, host="0.0.0.0", port=PORT)
