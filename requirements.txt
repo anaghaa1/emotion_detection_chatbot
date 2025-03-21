@@ -1,6 +1,6 @@
 Flask
 flask-cors
-torch==2.1.0
+torch==2.1.0+cpu
 soundfile
 transformers
 cohere
@@ -8,7 +8,7 @@ python-dotenv
 streamlit
 requests
 sounddevice
-numpy
+numpy==1.24.3
 scipy
 speechrecognition
 gtts
