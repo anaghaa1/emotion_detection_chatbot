@@ -17,7 +17,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Google Drive file ID for the model
-GOOGLE_DRIVE_FILE_ID = "1jHqUsguayTcoyxW1Ckqu8k4uLIlEXzai"  # Corrected File ID
+GOOGLE_DRIVE_FILE_ID = "1jHqUsguayTcoyxW1Ckqu8k4uLIlEXzai"  # Replace with your actual file ID
 MODEL_PATH = "my_trained_model.pth"
 
 # Function to download model from Google Drive
@@ -30,12 +30,21 @@ def download_model():
 # Ensure model is available
 download_model()
 
-# Load the trained emotion detection model
-processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base")
+# Load a smaller model to fit Render's memory limit
+MODEL_NAME = "facebook/wav2vec2-large-960h"  # Smaller model
+
+# Initialize processor and model
+processor = Wav2Vec2Processor.from_pretrained(MODEL_NAME)
 model = Wav2Vec2ForSequenceClassification.from_pretrained(
-    "facebook/wav2vec2-base", num_labels=7
+    MODEL_NAME, num_labels=7, state_dict=torch.load(MODEL_PATH, map_location="cpu")
 )
-model.load_state_dict(torch.load(MODEL_PATH, map_location=torch.device("cpu")), strict=False)
+
+# Enable gradient checkpointing for memory efficiency
+model.gradient_checkpointing_enable()
+
+# Move model to CPU (Render free tier has no GPU)
+device = torch.device("cpu")
+model.to(device)
 model.eval()  # Set model to evaluation mode
 
 # Emotion label mapping
@@ -51,7 +60,7 @@ def predict_emotion():
     audio_data, samplerate = sf.read(io.BytesIO(file.read()), dtype="float32")
 
     # Preprocess audio for model
-    inputs = processor(audio_data, sampling_rate=samplerate, return_tensors="pt", padding=True)
+    inputs = processor(audio_data, sampling_rate=samplerate, return_tensors="pt", padding=True).to(device)
 
     with torch.no_grad():
         logits = model(**inputs).logits
@@ -87,7 +96,5 @@ def get_cohere_response():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Set correct PORT for Render
-PORT = int(os.getenv("PORT", 5000))
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=PORT)
+    app.run(debug=False, host="0.0.0.0", port=5001)  # Disable debug for production
